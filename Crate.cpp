@@ -18,8 +18,11 @@ namespace Crate {
     m_rotation(rotation_)
     {
         if(!m_instance_count)
-            m_model = new Model("models/crate.3ds");
+            m_model = new Model("models/tank.3ds");
         ++m_instance_count;
+
+		cannon_rotation = m_rotation;
+		cannon_power = 200.0f;
         
         create_body();
     }
@@ -79,24 +82,47 @@ namespace Crate {
     }
     
     void Crate::move_forward(){
-        m_corner.x += 3;
+		
+		float angle = m_rotation.get_rotation().second;
+
+		float dist_x = -3.0f * cos(angle);
+		float dist_y = 3.0f * sin(angle);
+		        
+		m_corner.x += dist_x;
+		m_corner.y += dist_y;
     }
 
     void Crate::move_back(){
-        m_corner.x -= 3;
+		float angle = m_rotation.get_rotation().second;
+
+		float dist_x = -3.0f * cos(angle);
+		float dist_y = 3.0f * sin(angle);
+		        
+		m_corner.x -= dist_x;
+		m_corner.y -= dist_y;
     }
     
     void Crate::turn_left(){
-        m_rotation = Zeni::Quaternion::Axis_Angle(Zeni::Vector3f(0, 0, 1), 3.14/20) * m_rotation;
+        m_rotation = Zeni::Quaternion::Axis_Angle(Zeni::Vector3f(0, 0, 1), 3.14/30) * m_rotation;
+        cannon_rotation = Zeni::Quaternion::Axis_Angle(Zeni::Vector3f(0, 0, 1), 3.14/30) * cannon_rotation;
         
-
     }
     
     void Crate::turn_right(){
-        m_rotation = Zeni::Quaternion::Axis_Angle(Zeni::Vector3f(0, 0, 1), -3.14/20) * m_rotation;
-
+        m_rotation = Zeni::Quaternion::Axis_Angle(Zeni::Vector3f(0, 0, 1), -3.14/30) * m_rotation;
+        cannon_rotation = Zeni::Quaternion::Axis_Angle(Zeni::Vector3f(0, 0, 1), -3.14/30) * cannon_rotation;
     }
     
+	
+	Projectile * Crate::fire(){
+		Projectile *proj = new Projectile(m_corner, Vector3f(15.0f, 15.0f, 15.0f));
+		float projectile_angle = cannon_rotation.get_rotation().second;
+		Vector3f initial_velocity(-1.0f * cannon_power*cos(projectile_angle), cannon_power*sin(projectile_angle), cannon_power*sin(3.14/2));
+		proj->set_velocity(initial_velocity);
+		return proj;
+	}
+	
+
     
     
     Model * Crate::m_model = 0;

@@ -7,6 +7,7 @@
 #include <zenilib.h>
 
 #include "Crate_State.h"
+#include "Projectile.h"
 
 #if defined(_DEBUG) && defined(_WINDOWS)
 #define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -38,6 +39,7 @@ private:
 
   void render() {
     get_Video().set_2d(make_pair(Point2f(), Point2f(800.0f, 600.0f)), true);
+
 
     tb.render();
   }

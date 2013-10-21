@@ -3,8 +3,10 @@
 
 #include "Crate.h"
 #include "Player.h"
+#include "Projectile.h"
 #include <Zeni/Gamestate.h>
 #include <Zeni/Timer.h>
+#include <list>
 
 namespace Crate {
     
@@ -35,15 +37,19 @@ namespace Crate {
         
         Zeni::Time_HQ time_passed;
         
-        Crate m_crate;
-        
+        Crate m_tank;
         Player m_player;
+		std::list<Projectile*> bullets;
+		//std::list<int> tree;
+
+
         
         bool m_moved;
         bool m_forward;
         bool m_backward;
         bool m_rotate_left;
         bool m_rotate_right;
+		bool m_fire;
     };
     
 }

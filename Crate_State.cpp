@@ -8,7 +8,7 @@ using namespace Zeni::Collision;
 namespace Crate {
     
     Crate_State::Crate_State()
-    : m_crate(Point3f(12.0f, 12.0f, 0.0f),
+    : m_tank(Point3f(12.0f, 12.0f, 0.0f),
               Vector3f(30.0f, 30.0f, 30.0f)),
     m_player(Camera(Point3f(0.0f, 0.0f, 50.0f),
                     Quaternion(),
@@ -18,7 +18,8 @@ namespace Crate {
     m_forward(false),
     m_backward(false),
     m_rotate_left(false),
-    m_rotate_right(false)
+    m_rotate_right(false),
+	m_fire(false)
     {
         set_pausable(true);
     }
@@ -31,10 +32,10 @@ namespace Crate {
         switch(event.keysym.sym) {
             case SDLK_UP:
                 m_forward = event.type == SDL_KEYDOWN;
-//                m_crate.move_forward();
+//                m_tank.move_forward();
                 break;
             case SDLK_DOWN:
-//                m_crate.move_back();
+//                m_tank.move_back();
                 m_backward = event.type == SDL_KEYDOWN;
 
                 break;
@@ -42,15 +43,17 @@ namespace Crate {
             case SDLK_LEFT:
                 m_rotate_left = event.type == SDL_KEYDOWN;
 
-//                m_crate.turn_left();
+//                m_tank.turn_left();
                 break;
                 
             case SDLK_RIGHT:
                 m_rotate_right = event.type == SDL_KEYDOWN;
-//                m_crate.turn_right();
+//                m_tank.turn_right();
                 break;
                 
-                
+			case SDLK_RETURN:
+				m_fire = event.type == SDL_KEYDOWN;
+				break;
                 
                 
             case SDLK_w:
@@ -93,28 +96,33 @@ namespace Crate {
         time_passed = current_time;
         
         if (m_forward){
-            m_crate.move_forward();
+            m_tank.move_forward();
             m_forward = false;
         }
         
         
         if (m_backward){
-            m_crate.move_back();
+            m_tank.move_back();
             m_backward = false;
         }
         
         
         if (m_rotate_left){
-            m_crate.turn_left();
+            m_tank.turn_left();
             m_rotate_left = false;
         }
         
         
         if (m_rotate_right){
-            m_crate.turn_right();
+            m_tank.turn_right();
             m_rotate_right = false;
         }
-        
+
+		if (m_fire)
+		{
+			bullets.push_back(m_tank.fire());
+			m_fire = false;
+		}
         
         
         /** Get forward and left vectors in the XY-plane **/
@@ -147,6 +155,21 @@ namespace Crate {
             /** Gravity has its effect **/
             z_vel -= Vector3f(0.0f, 0.0f, 50.0f * time_step);
             
+
+			/** Projectile Flying **/
+			for(std::list<Projectile *>::const_iterator it = bullets.begin(); it != bullets.end(); ){
+				(*it)->apply_gravity(time_step);
+
+				//Remove stopped bullets
+				if ((*it)->stopped())
+				{
+					it = bullets.erase(it);
+				}else
+				{
+					++it;
+				}
+			}
+
             /** Try to move on each axis **/
             partial_step(time_step, x_vel);
             partial_step(time_step, y_vel);
@@ -166,7 +189,12 @@ namespace Crate {
         
         vr.set_3d(m_player.get_camera());
         
-        m_crate.render();
+        m_tank.render();
+
+		for(std::list<Projectile *>::const_iterator it = bullets.begin(); it != bullets.end(); ++it){
+			(*it)->render();
+		}
+			
     }
     
     void Crate_State::partial_step(const float &time_step, const Vector3f &velocity) {
@@ -176,11 +204,11 @@ namespace Crate {
         m_player.step(time_step);
         
         /** If collision with the crate has occurred, roll things back **/
-        if(m_crate.get_body().intersects(m_player.get_body())) {
+        if(m_tank.get_body().intersects(m_player.get_body())) {
             if(m_moved)
             {
                 /** Play a sound if possible **/
-                m_crate.collide();
+                m_tank.collide();
                 m_moved = false;
             }
             

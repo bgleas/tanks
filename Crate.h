@@ -6,6 +6,9 @@
 #include <Zeni/Quaternion.h>
 #include <Zeni/Sound.h>
 #include <Zeni/Vector3f.h>
+#include <utility>
+#include "Projectile.h"
+
 
 namespace Crate {
     
@@ -31,6 +34,8 @@ namespace Crate {
         void turn_left();
         
         void turn_right();
+
+		Projectile* fire();
         
 private:
         void create_body();
@@ -45,6 +50,8 @@ private:
         Zeni::Point3f m_corner;
         Zeni::Vector3f m_scale;
         Zeni::Quaternion m_rotation;
+		Zeni::Quaternion cannon_rotation;
+		float cannon_power;
         
         // Level 3
         Zeni::Collision::Parallelepiped m_body; // not motion so much as collision
