@@ -33,10 +33,12 @@ namespace Crate {
     void set_on_ground(const bool &is_on_ground_);
     void jump();
 
-    void step(const float &time_step);
+      void step(const float &time_step);
+      
+      void look_at(const Zeni::Point3f &);
 
   private:
-    void create_body();
+    //void create_body();
 
     // Level 1/2
     Zeni::Camera m_camera;

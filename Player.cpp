@@ -3,7 +3,7 @@
 #include "Player.h"
 
 using namespace Zeni;
-using namespace Zeni::Collision;
+//using namespace Zeni::Collision;
 
 namespace Crate {
 
@@ -12,18 +12,16 @@ namespace Crate {
          const float radius_)
    : m_camera(camera_),
      m_end_point_b(end_point_b_),
-     m_radius(radius_),
+     m_radius(0),
      m_is_on_ground(false)
   {
     m_camera.fov_rad = Zeni::Global::pi / 3.0f;
-
-    create_body();
+    //create_body();
   }
 
   // Level 2
   void Player::set_position(const Point3f &position) {
     m_camera.position = position;
-    create_body();
   }
 
   void Player::adjust_pitch(const float &phi) {
@@ -41,23 +39,23 @@ namespace Crate {
   }
 
   void Player::set_on_ground(const bool &is_on_ground_) {
-    m_is_on_ground = is_on_ground_;
-    if(m_is_on_ground)
-      m_velocity.k = 0.0f;
+//    m_is_on_ground = is_on_ground_;
+//    if(m_is_on_ground)
+//      m_velocity.k = 0.0f;
   }
 
   void Player::jump() {
-    if(m_is_on_ground) {
-      m_velocity.k += 60.0f;
-      m_is_on_ground = false;
-    }
+//    if(m_is_on_ground) {
+//      m_velocity.k += 60.0f;
+//      m_is_on_ground = false;
+//    }
   }
 
   void Player::step(const float &time_step) {
     m_camera.position += time_step * m_velocity;
-    create_body();
   }
 
+  /*
   void Player::create_body() {
     Sound &sr = get_Sound();
 
@@ -69,5 +67,11 @@ namespace Crate {
     sr.set_listener_forward_and_up(m_camera.get_forward(), m_camera.get_up());
     sr.set_listener_velocity(m_velocity);
   }
+  */
 
+    void Player::look_at(const Point3f &world_coord){
+        m_camera.look_at(world_coord);
+    }
+    
 }
+
